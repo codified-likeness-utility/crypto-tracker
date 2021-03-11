@@ -18,7 +18,7 @@ c6 = Crypto.create(name: "Polkadot", symbol: "DOT", rank: 6, price: 33.81, perce
 c7 = Crypto.create(name: "XRP", symbol: "XRP", rank: 7, price: 0.4645, percent_change_1hr: 0.20, percent_change_24hr: 0.21, percent_change_7d: 0.22)
 c8 = Crypto.create(name: "Uniswap", symbol: "UNI", rank: 8, price: 28.82, percent_change_1hr: 0.23, percent_change_24hr: 0.24, percent_change_7d: 0.25)
 c9 = Crypto.create(name: "Litecoin", symbol: "LTC", rank: 9, price: 184.24, percent_change_1hr: 5.26, percent_change_24hr: 0.27, percent_change_7d: 0.28)
-c10 = Crypto.create(name: "Chainlink", symbol: "LINK", rank: 10, price: 27.79, percent_change_1hr: 0.29, percent_change_24hr: 0.30, percent_change_7d: 0.31
+c10 = Crypto.create(name: "Chainlink", symbol: "LINK", rank: 10, price: 27.79, percent_change_1hr: 0.29, percent_change_24hr: 0.30, percent_change_7d: 0.31)
 
 #Portfolios 
 p1 = Portfolio.create(user_id: u1.id)
@@ -31,7 +31,7 @@ f2 = Favorite.create(name: "Ethereum", price: 1665.12, symbol: "ETH", crypto_id:
 f3 = Favorite.create(name: "Tether", price: 1.00, symbol: "USDT", crypto_id: c3.id, user_id: u1.id)
 
 #Trades ===== > JOINER < =====
-t1 = Trade.create(portfolio_id: p1.id, crypto_id: c1.id)
-t2 = Trade.create(portfolio_id: p1.id, crypto_id: c2.id)
-t3 = Trade.create(portfolio_id: p2.id, crypto_id: c1.id)
-t4 = Trade.create(portfolio_id: p3.id, crypto_id: c1.id)
+t1 = Trade.create(portfolio_id: p1.id, crypto_id: c1.id, count: 1)
+t2 = Trade.create(portfolio_id: p1.id, crypto_id: c2.id, count: 3)
+t3 = Trade.create(portfolio_id: p2.id, crypto_id: c1.id, count: 2)
+t4 = Trade.create(portfolio_id: p3.id, crypto_id: c1.id, count: 2)

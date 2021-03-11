@@ -37,6 +37,7 @@ ActiveRecord::Schema.define(version: 2021_03_09_155435) do
   create_table "trades", force: :cascade do |t|
     t.integer "portfolio_id"
     t.integer "crypto_id"
+    t.integer "count"
   end
 
   create_table "users", force: :cascade do |t|

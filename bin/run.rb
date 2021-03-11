@@ -75,7 +75,9 @@ def main_menu
 
     case menu_selection
     when "My Portfolio"
-        Portfolio.find_portfolios #<<<< Method NOT Done >>>>>#
+        @@current_user.portfolios.first.trades.each {|trade|
+            puts "Crypto: #{trade.crypto.name} / Price: #{trade.crypto.price} / Amount Purchased: #{trade.count} / Total Price: #{trade.count * trade.crypto.price}"
+        }
     when "My Favorites"
         Favorite.user_favorites #<<<< Method NOT Done >>>>>#
     when "Top 20 Cryptos"
