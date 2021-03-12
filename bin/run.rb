@@ -138,7 +138,6 @@ def new_trade
         if purchase_confirmation == "Yes"
             portfolio_id = Portfolio.last.id +=1
             crypto = Crypto.find_by(name: "#{buy_choice}")
-            binding.pry
             crypto_id = crypto.id
             save_confirmed_trade = Trade.create(portfolio_id: portfolio_id, crypto_id: crypto_id, count: buy_amount) #<<<<< IN PROGRESS
         else purchase_confirmation == "No"
