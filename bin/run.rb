@@ -10,7 +10,8 @@ def welcome
     puts "Buy, Sell & Track all of your favorite Crytocurrencies!"
     puts "\n" * 1
 
-    #put Top 5 cryptos
+    tp.set Crypto, :rank, :name, :symbol, :price, :percent_change_1hr
+        top_cryptos = tp Crypto.all, :except => :id
 end
 
 def intro
@@ -69,28 +70,57 @@ def main_menu
         main_menu.enum "."
         main_menu.choice "My Portfolio"
         main_menu.choice "My Favorites"
-        main_menu.choice "Buy or Sell Crypto"
-        main_menu.choice "Top 20 Cryptos"
+        main_menu.choice "Buy Cryptos"
+        main_menu.choice "Today's Top 10 Cryptos"
+        main_menu.choice "Change Account Info"
         main_menu.choice "Exit"
     end 
 
     case menu_selection
     when "My Portfolio"
+        user_portfolio
+    when "My Favorites"
+        user_favorites 
+    when "Buy Cryptos"
+        new_trade
+    when "Today's Top 10 Cryptos"
         title = Artii::Base.new(:font => "slant")
+        puts title.asciify("Today's Top 10 Crypto's")
+        puts "\n" * 2
+        tp.set Crypto, :rank, :name, :symbol, :price, :percent_change_1hr
+        top_cryptos = tp Crypto.all, :except => :id
+    when "Change Account Info"
+        User.change_user_info
+    else "Exit"
+        exit
+    end
+end
+
+def user_portfolio
+    title = Artii::Base.new(:font => "slant")
         puts title.asciify("#{@current_user.user_name}'s Portfolio")
         puts "\n" * 2
         @current_user.portfolios.first.trades.each {|trade|
             puts "Crypto: #{trade.crypto.name} / Price: #{trade.crypto.price} / Amount Purchased: #{trade.count} / Total Value: #{trade.count * trade.crypto.price}"
         }
-    when "My Favorites"
-        user_favorites #<<<< Method NOT Done >>>>>#
-    when "Buy or Sell Crypto"
-        new_trade
-    when "Top 20 Cryptos"
-        Crypto.top_20 #<<<< Method NOT Done >>>>>#
-    else "Exit"
-        exit
-    end
+        last_trade = @current_user.portfolios.last.trades.each {|trade|}
+            last_trade.each {|trade| puts "Crypto: #{trade.crypto.name} / Price: #{trade.crypto.price} / Amount Purchased: #{trade.count} / Total Value: #{trade.count * trade.crypto.price}"}
+        puts "\n" * 2
+        binding.pry
+        menu_selection = PROMPT.select("Please select from the following options:") do |main_menu|
+            main_menu.enum "."
+            main_menu.choice "Main Menu"
+            main_menu.choice "Buy Cryptos"
+            main_menu.choice "Exit"
+        end
+        case menu_selection
+        when "Main Menu"
+            main_menu
+        when "Buy Cryptos"
+            new_trade
+        else "Exit"
+            exit
+        end
 end
 
 def user_favorites
@@ -121,42 +151,49 @@ end
 def new_trade
     buy_or_sell = PROMPT.select("Would you like to Buy or Sell a Crypto?", %w(Buy Sell Exit))
 
-    if buy_or_sell == "Buy"
+    case buy_or_sell
+    when "Buy"
         crypto_list = ["Bitcoin", "Ethereum","Tether", "Cardano", "Binance Coin", "Polkadot", "XRP", "Uniswap", "Litecoin", "Chainlink" ]
         buy_choice = PROMPT.select("Select which Crypto you would like to purchase", crypto_list, filter: true)
-        if buy_choice
+        
+        case buy_choice
+        when buy_choice
             buy_amount = PROMPT.ask("How many #{buy_choice} would you like to purchase?") { |q|
                 q.in("1-99")
             }
         end
-        
-        if buy_amount != nil
-            purchase_confirmation = PROMPT.yes?("Looks like you want to purchase #{buy_amount.light_green } #{buy_choice.light_green}, is that correct?") do |q|
-                q.suffix "Yes/No"
-        
-
-        if purchase_confirmation == "Yes"
-            portfolio_id = Portfolio.last.id +=1
-            crypto = Crypto.find_by(name: "#{buy_choice}")
-            crypto_id = crypto.id
-            save_confirmed_trade = Trade.create(portfolio_id: portfolio_id, crypto_id: crypto_id, count: buy_amount) #<<<<< IN PROGRESS
-        else purchase_confirmation == "No"
-            new_trade
-        end
-
-        if save_confirmed_trade
-            menu_selection = PROMPT.select("Your trade has been confirmed! Would you like to return to the Main Menu or Exit?", %w(MainMenu Exit))
-        end
-
-        if menu_selection == "MainMenu"
-            main_menu
-        else menu_selection == "Exit"
-            exit
-        end
-
-    elsif buy_or_sell == "Sell"
-        puts "Not taking sell orders on Gamestop!!" #code to sell a crypto? this may be a strecth goal
-    else buy_or_sell == "Exit"
+            case buy_amount
+            when buy_amount
+                purchase_confirmation = PROMPT.yes?("Looks like you want to purchase #{buy_amount.light_green } #{buy_choice.light_green}, is that correct?") do |q|
+                    q.suffix "Yes/No"
+            end
+                case purchase_confirmation
+                when purchase_confirmation
+                        portfolio_id = Portfolio.last.id +=1
+                        crypto = Crypto.find_by(name: "#{buy_choice}")
+                        crypto_id = crypto.id
+                        save_confirmed_trade = Trade.create(portfolio_id: portfolio_id, crypto_id: crypto_id, count: buy_amount)
+                        puts "Trade Oder Processing".light_red
+             
+                    case save_confirmed_trade        
+                    when save_confirmed_trade
+                        save_new_portfolio = Portfolio.create(id: portfolio_id, user_id: @current_user.id)
+                            menu_selection = PROMPT.select("Your trade has been confirmed!".light_green, %w(Menu Exit))
+                        case menu_selection
+                        when "Menu"
+                                main_menu
+                        when "Exit"
+                                exit
+                        else
+                            puts "You did not confirm your trade, please try again!"
+                            new_trade
+                        end
+                    end
+                end
+            end
+    when "Sell"
+        sell_menu_selection = PROMPT.select("Sorry, we are currently not accepting sell orders." %w(Menu Exit))
+    else "Exit"
         exit
     end
 end
